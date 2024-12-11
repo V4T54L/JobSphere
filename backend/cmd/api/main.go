@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/internals/routes"
+	"backend/internals/store"
 	"log"
 	"os"
 
@@ -14,8 +15,14 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	db, err := store.InitDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	r := gin.Default()
-	routes.InitRoutes(r)
+	routes.InitRoutes(r, db)
 
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
