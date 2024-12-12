@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internals/handlers"
+	"backend/internals/middlewares"
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
@@ -19,17 +20,19 @@ func InitRoutes(r *gin.Engine, db *sql.DB) {
 	r.GET("/jobs", jobHandler.GetAllJobsHandler(db))
 	r.POST("forgotpassword", authHandler.ForgotPasswordHandler(db))
 
-	r.GET("/users/:id", userHandler.GetUserByIdHandler(db))
-	r.PUT("/users/:id", userHandler.UpdateUserProfileHandler(db))
-	r.POST("/users/:id/picture", userHandler.UpdateUserProfilePcitureHandler(db))
-	r.PUT("users/change-password", userHandler.ChangePasswordHandler(db))
+	authenticatedRoutes := r.Group("/")
+	authenticatedRoutes.Use(middlewares.AuthMiddleware())
+	authenticatedRoutes.GET("/users/:id", userHandler.GetUserByIdHandler(db))
+	authenticatedRoutes.PUT("/users/:id", userHandler.UpdateUserProfileHandler(db))
+	authenticatedRoutes.POST("/users/:id/picture", userHandler.UpdateUserProfilePcitureHandler(db))
+	authenticatedRoutes.PUT("users/change-password", middlewares.PasswordValidationMiddleware(), userHandler.ChangePasswordHandler(db))
 
-	r.POST("/jobs", jobHandler.CreateJobHandler(db))
-	r.GET("/jobsByUser", jobHandler.GetAllJobsByUserHandler(db))
-	r.GET("/jobs/:id", jobHandler.GetJobByIdHandler(db))
-	r.PUT("/jobs/:id", jobHandler.UpdateJobByHandler(db))
-	r.DELETE("/jobs/:id", jobHandler.DeleteJobByHandler(db))
+	authenticatedRoutes.POST("/jobs", jobHandler.CreateJobHandler(db))
+	authenticatedRoutes.GET("/jobsByUser", jobHandler.GetAllJobsByUserHandler(db))
+	authenticatedRoutes.GET("/jobs/:id", jobHandler.GetJobByIdHandler(db))
+	authenticatedRoutes.PUT("/jobs/:id", jobHandler.UpdateJobByHandler(db))
+	authenticatedRoutes.DELETE("/jobs/:id", jobHandler.DeleteJobByHandler(db))
 
-	r.GET("/users", userHandler.GetAllUsersHandler(db))
-	r.DELETE("/users/:id", userHandler.DeleteUserByIdHandler(db))
+	authenticatedRoutes.GET("/users", userHandler.GetAllUsersHandler(db))
+	authenticatedRoutes.DELETE("/users/:id", userHandler.DeleteUserByIdHandler(db))
 }
