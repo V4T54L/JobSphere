@@ -18,11 +18,11 @@ import (
 const queryTimeout = time.Second * 5
 
 type UserHandler struct {
-	service services.UserService
+	service *services.UserService
 }
 
 func NewUserHandler(db *sql.DB) *UserHandler {
-	return &UserHandler{service: *services.NewUserService(db)}
+	return &UserHandler{service: services.NewUserService(db)}
 }
 
 func (h *UserHandler) GetUserByIdHandler(db *sql.DB) gin.HandlerFunc {

@@ -15,4 +15,14 @@ func InitRoutes(r *gin.Engine, db *sql.DB) {
 	r.PUT("/users/:id", userHandler.UpdateUserProfileHandler(db))
 	r.POST("/users/:id/picture", userHandler.UpdateUserProfilePcitureHandler(db))
 	r.PUT("users/change-password", userHandler.ChangePasswordHandler(db))
+
+	jobHandler := handlers.NewJobHandler(db)
+	r.POST("/jobs", jobHandler.CreateJobHandler(db))
+	r.GET("/jobsByUser", jobHandler.GetAllJobsByUserHandler(db))
+	r.GET("/jobs/:id", jobHandler.GetJobByIdHandler(db))
+	r.PUT("/jobs/:id", jobHandler.UpdateJobByHandler(db))
+	r.DELETE("/jobs/:id", jobHandler.DeleteJobByHandler(db))
+
+	r.GET("/users", userHandler.GetAllUsersHandler(db))
+	r.DELETE("/users/:id", userHandler.DeleteUserByIdHandler(db))
 }
