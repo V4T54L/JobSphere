@@ -10,13 +10,20 @@ import (
 func InitRoutes(r *gin.Engine, db *sql.DB) {
 	r.GET("/health", handlers.HealthCheckHandler)
 
+	authHandler := handlers.NewAuthHandler(db)
+	jobHandler := handlers.NewJobHandler(db)
 	userHandler := handlers.NewUserHandler(db)
+
+	r.POST("/login", authHandler.LoginHandler(db))
+	r.POST("/register", authHandler.RegisterHandler(db))
+	r.GET("/jobs", jobHandler.GetAllJobsHandler(db))
+	r.POST("forgotpassword", authHandler.ForgotPasswordHandler(db))
+
 	r.GET("/users/:id", userHandler.GetUserByIdHandler(db))
 	r.PUT("/users/:id", userHandler.UpdateUserProfileHandler(db))
 	r.POST("/users/:id/picture", userHandler.UpdateUserProfilePcitureHandler(db))
 	r.PUT("users/change-password", userHandler.ChangePasswordHandler(db))
 
-	jobHandler := handlers.NewJobHandler(db)
 	r.POST("/jobs", jobHandler.CreateJobHandler(db))
 	r.GET("/jobsByUser", jobHandler.GetAllJobsByUserHandler(db))
 	r.GET("/jobs/:id", jobHandler.GetJobByIdHandler(db))
