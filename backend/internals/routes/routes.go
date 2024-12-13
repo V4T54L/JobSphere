@@ -9,6 +9,8 @@ import (
 )
 
 func InitRoutes(r *gin.Engine, db *sql.DB) {
+	r.Use(middlewares.CORSMiddleware())
+
 	r.GET("/health", handlers.HealthCheckHandler)
 
 	authHandler := handlers.NewAuthHandler(db)
